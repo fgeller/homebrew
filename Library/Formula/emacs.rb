@@ -18,12 +18,18 @@ class Emacs < Formula
     head 'bzr://http://bzr.savannah.gnu.org/r/emacs/trunk'
   end
 
+  if ARGV.include? "--pretest"
+    url 'ftp://alpha.gnu.org/gnu/emacs/pretest/emacs-24.0.94.tar.gz'
+    md5 '17e22339c4881368e6f96660f9c07393'
+  end
+
   def options
     [
       ["--cocoa", "Build a Cocoa version of emacs"],
       ["--srgb", "Enable sRGB colors in the Cocoa version of emacs"],
       ["--with-x", "Include X11 support"],
       ["--use-git-head", "Use Savannah git mirror for HEAD builds"],
+      ["--pretest", "Build the latest pretest."],
     ]
   end
 
@@ -31,7 +37,7 @@ class Emacs < Formula
     p = []
 
     # Fix for building with Xcode 4; harmless on Xcode 3.x.
-    unless ARGV.build_head?
+    unless ARGV.build_head? or ARGV.include? "--pretest"
       p << DATA
     end
 
@@ -44,12 +50,14 @@ class Emacs < Formula
   end
 
   def install
-    args = ["--prefix=#{prefix}",
+    args = [
+            "--prefix=#{prefix}",
             "--without-dbus",
             "--enable-locallisppath=#{HOMEBREW_PREFIX}/share/emacs/site-lisp",
-            "--infodir=#{info}/emacs"]
+            "--infodir=#{ENV['HOME']}/.emacs.d/info",
+           ]
 
-    if ARGV.build_head? and File.exists? "./autogen/copy_autogen"
+    if (ARGV.build_head? or ARGV.include? "--pretest") and File.exists? "./autogen/copy_autogen"
       opoo "Using copy_autogen"
       puts "See https://github.com/mxcl/homebrew/issues/4852"
       system "autogen/copy_autogen"
@@ -70,7 +78,7 @@ class Emacs < Formula
       system "make install"
       prefix.install "nextstep/Emacs.app"
 
-      unless ARGV.build_head?
+      unless ARGV.build_head? or ARGV.include? "--pretest"
         bin.mkpath
         ln_s prefix+'Emacs.app/Contents/MacOS/Emacs', bin+'emacs'
         ln_s prefix+'Emacs.app/Contents/MacOS/bin/emacsclient', bin
