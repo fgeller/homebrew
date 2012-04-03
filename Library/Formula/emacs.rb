@@ -19,8 +19,8 @@ class Emacs < Formula
   end
 
   if ARGV.include? "--pretest"
-    url 'ftp://alpha.gnu.org/gnu/emacs/pretest/emacs-24.0.94.tar.gz'
-    md5 '17e22339c4881368e6f96660f9c07393'
+    url 'ftp://alpha.gnu.org/gnu/emacs/pretest/emacs-24.0.95.tar.gz'
+    md5 '8c2d24773bc68c2b263ef16370b9448b'
   end
 
   def options
